@@ -1,8 +1,11 @@
+// routes/user.routes.js
+
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // Register new user
 router.post("/register", async (req, res) => {
@@ -42,11 +45,11 @@ router.post("/register", async (req, res) => {
     await user.save();
 
     const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
       expiresIn: "1h",
     });
 
-    res.status(201).json({ token });
+    res.status(201).json({ authToken: token });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
@@ -69,14 +72,29 @@ router.post("/login", async (req, res) => {
     }
 
     const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
       expiresIn: "1h",
     });
 
-    res.json({ token });
+    res.json({ authToken: token });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
+  }
+});
+
+// Get user profile
+router.get("/profile/:userId", isAuthenticated, async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Failed to retrieve user");
   }
 });
 

@@ -1,10 +1,25 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
-
-const app = express();
 const PORT = process.env.PORT || 5005;
+const userRoutes = require("./routes/users.routes");
+const supplementRoutes = require("./routes/supplements.routes");
+const authRoutes = require("./routes/auth.routes");
+
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error(err));
+
+// Initialize Express app
+const app = express();
 
 // Middleware
 app.use(
@@ -16,23 +31,13 @@ app.use(
   })
 );
 app.use(express.json());
-
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error(err));
-
-// Import routes
-const userRoutes = require("./routes/users.routes");
-const supplementRoutes = require("./routes/supplements.routes");
+app.use(morgan("dev"));
+app.use(cookieParser());
 
 // Use routes
 app.use("/api/users", userRoutes);
 app.use("/api/supplements", supplementRoutes);
+app.use("/auth", authRoutes);
 
 // Basic route
 app.get("/", (req, res) => {

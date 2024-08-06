@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Supplement = require("../models/Supplement.model");
-const auth = require("../middleware/auth");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // Add a new supplement (Admin or authenticated user access)
-router.post("/add", auth, async (req, res) => {
+router.post("/add", isAuthenticated, async (req, res) => {
   const { name, recommendedDosage, timing, interactions } = req.body;
 
   try {
