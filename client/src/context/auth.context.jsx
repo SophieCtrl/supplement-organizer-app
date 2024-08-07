@@ -22,7 +22,7 @@ function AuthProviderWrapper(props) {
 
     if (storedToken) {
       axiosInstance
-        .get(`${API_URL}/auth/verify`)
+        .get(`/auth/verify`)
         .then((response) => {
           const user = response.data;
           setIsLoggedIn(true);

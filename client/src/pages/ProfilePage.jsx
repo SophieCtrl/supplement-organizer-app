@@ -1,23 +1,31 @@
 // src/pages/ProfilePage.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "../axiosInstance";
+import { AuthContext } from "../context/auth.context";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
+  const { isLoggedIn } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("/api/users/profile"); // Adjust the endpoint as needed
+        const response = await axios.get("/api/users/profile");
         setUser(response.data);
       } catch (err) {
         setError("Failed to fetch user profile.");
       }
     };
 
-    fetchUserProfile();
-  }, []);
+    if (isLoggedIn) {
+      fetchUserProfile();
+    }
+  }, [isLoggedIn]);
+
+  if (!isLoggedIn) {
+    return <div>Please log in to see your profile.</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">

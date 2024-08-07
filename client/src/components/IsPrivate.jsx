@@ -1,10 +1,19 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/auth.context";
 
 const IsPrivate = ({ children }) => {
   const token = localStorage.getItem("token");
+  const { isLoggedIn, isLoading } = useContext(AuthContext);
 
-  return token ? <>{children}</> : <Navigate to="/login" />;
+  if (isLoading) return <p>Loading ...</p>;
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
+  } else {
+    return children;
+  }
 };
 
 export default IsPrivate;

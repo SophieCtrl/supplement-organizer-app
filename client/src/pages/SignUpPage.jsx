@@ -84,7 +84,7 @@ const SignUpPage = () => {
         formData
       );
       setSuccess("Registration successful! Redirecting to login page...");
-      setTimeout(() => navigate("/login"), 3000); // Redirect after 3 seconds
+      setTimeout(() => navigate("/login"), 1000);
     } catch (error) {
       setError(error.response?.data?.message || "Server error");
     }
@@ -251,6 +251,9 @@ const SignUpPage = () => {
             ))}
           </select>
         </div>
+
+        {success && <div className="mb-4 text-green-500">{success}</div>}
+        {error && <div className="mb-4 text-red-500">{error}</div>}
 
         <button
           type="submit"

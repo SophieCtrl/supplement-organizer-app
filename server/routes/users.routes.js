@@ -1,5 +1,3 @@
-// routes/user.routes.js
-
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -84,9 +82,9 @@ router.post("/login", async (req, res) => {
 });
 
 // Get user profile
-router.get("/profile/:userId", isAuthenticated, async (req, res) => {
-  const { userId } = req.params;
+router.get("/profile", isAuthenticated, async (req, res) => {
   try {
+    const userId = req.user.id;
     const user = await User.findById(userId).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });

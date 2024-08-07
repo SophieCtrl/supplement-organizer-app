@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 
 const Navbar = () => {
-  const { isLoggedIn, user } = useContext(AuthContext);
+  const { isLoggedIn, logOutUser } = useContext(AuthContext);
 
   return (
     <nav className="bg-blue-600 p-4 text-white">
@@ -35,6 +35,9 @@ const Navbar = () => {
               <Link to="/profile" className="hover:underline">
                 Profile
               </Link>
+            </li>
+            <li>
+              <button onClick={logOutUser}>Logout</button>
             </li>
           </>
         )}
