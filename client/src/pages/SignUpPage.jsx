@@ -12,17 +12,15 @@ const nutritionalTypes = [
   "Paleo",
 ];
 
-const illnesses = [
-  "Diabetes",
-  "Hypertension",
-  "Heart Disease",
-  "Chronic Kidney Disease",
-  "Asthma",
-  "Arthritis",
-  "Osteoporosis",
-  "Cancer",
-  "Digestive Disorders",
-  "Depression",
+const goals = [
+  "Improve Overall Well-being",
+  "Emotional Balance",
+  "Manage Anxiety",
+  "Weight Management",
+  "Maternal Health",
+  "Restful Sleep",
+  "Boost Energy",
+  "Stress Relief",
 ];
 
 const symptoms = [
@@ -36,6 +34,59 @@ const symptoms = [
   "Skin Issues",
   "Mood Swings",
   "Dizziness",
+  "Fever",
+  "Chills",
+  "Sweating",
+  "Shortness of Breath",
+  "Chest Pain",
+  "Cough",
+  "Sore Throat",
+  "Runny Nose",
+  "Congestion",
+  "Loss of Appetite",
+  "Weight Loss",
+  "Weight Gain",
+  "Digestive Issues",
+  "Constipation",
+  "Diarrhea",
+  "Abdominal Pain",
+  "Swelling",
+  "Bruising",
+  "Rashes",
+  "Itching",
+  "Memory Problems",
+  "Confusion",
+  "Tingling Sensation",
+  "Numbness",
+  "Sensitivity to Light",
+  "Sensitivity to Sound",
+  "Muscle Weakness",
+  "Joint Stiffness",
+  "Fainting",
+  "Unexplained Pain",
+  "Poor Concentration",
+  "Loss of Smell",
+  "Loss of Taste",
+  "Excessive Thirst",
+  "Frequent Urination",
+  "Dark Urine",
+  "Jaundice",
+  "Hives",
+  "Dry Mouth",
+  "Frequent Headaches",
+  "Back Pain",
+  "Abnormal Heartbeat",
+  "Difficulty Swallowing",
+  "Sore Muscles",
+  "Tremors",
+  "Vision Changes",
+  "Hearing Loss",
+  "Numbness in Extremities",
+  "Cramps",
+  "Excessive Hunger",
+  "Palpitations",
+  "Frequent Infections",
+  "Unexplained Fever",
 ];
 
 const SignUpPage = () => {
@@ -48,7 +99,7 @@ const SignUpPage = () => {
     weight: "",
     age: "",
     nutritionalType: "",
-    illnesses: [],
+    goals: [],
     symptoms: [],
   });
   const [success, setSuccess] = useState("");
@@ -61,7 +112,7 @@ const SignUpPage = () => {
         ...prevState,
         [name]: checked,
       }));
-    } else if (name === "illnesses" || name === "symptoms") {
+    } else if (name === "goals" || name === "symptoms") {
       setFormData((prevState) => ({
         ...prevState,
         [name]: prevState[name].includes(value)
@@ -91,18 +142,21 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 px-4 sm:px-6 lg:px-8 my-8">
       <form
-        className="bg-white p-6 rounded shadow-md w-full max-w-md"
+        className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Sign Up</h2>
 
-        {success && <div className="mb-4 text-green-500">{success}</div>}
-        {error && <div className="mb-4 text-red-500">{error}</div>}
+        {success && <div className="mb-4 text-green-600">{success}</div>}
+        {error && <div className="mb-4 text-red-600">{error}</div>}
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="username">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="username"
+          >
             Username
           </label>
           <input
@@ -111,13 +165,16 @@ const SignUpPage = () => {
             name="username"
             value={formData.username}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="email">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="email"
+          >
             Email
           </label>
           <input
@@ -126,13 +183,16 @@ const SignUpPage = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="password">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="password"
+          >
             Password
           </label>
           <input
@@ -141,13 +201,16 @@ const SignUpPage = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="height">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="height"
+          >
             Height
           </label>
           <input
@@ -156,13 +219,16 @@ const SignUpPage = () => {
             name="height"
             value={formData.height}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="weight">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="weight"
+          >
             Weight
           </label>
           <input
@@ -171,13 +237,16 @@ const SignUpPage = () => {
             name="weight"
             value={formData.weight}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="age">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="age"
+          >
             Age
           </label>
           <input
@@ -186,13 +255,16 @@ const SignUpPage = () => {
             name="age"
             value={formData.age}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="nutritionalType">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="nutritionalType"
+          >
             Nutritional Type
           </label>
           <select
@@ -200,7 +272,7 @@ const SignUpPage = () => {
             name="nutritionalType"
             value={formData.nutritionalType}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
             required
           >
             <option value="">Select Nutritional Type</option>
@@ -213,27 +285,33 @@ const SignUpPage = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="illnesses">
-            Illnesses
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="goals"
+          >
+            Goals
           </label>
           <select
-            id="illnesses"
-            name="illnesses"
+            id="goals"
+            name="goals"
             multiple
-            value={formData.illnesses}
+            value={formData.goals}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
           >
-            {illnesses.map((illness) => (
-              <option key={illness} value={illness}>
-                {illness}
+            {goals.map((goal) => (
+              <option key={goal} value={goal}>
+                {goal}
               </option>
             ))}
           </select>
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="symptoms">
+          <label
+            className="block text-gray-700 text-sm font-medium mb-2"
+            htmlFor="symptoms"
+          >
             Symptoms
           </label>
           <select
@@ -242,7 +320,7 @@ const SignUpPage = () => {
             multiple
             value={formData.symptoms}
             onChange={handleChange}
-            className="border border-gray-300 p-2 w-full rounded"
+            className="border border-gray-300 p-3 w-full rounded-lg"
           >
             {symptoms.map((symptom) => (
               <option key={symptom} value={symptom}>
@@ -252,19 +330,16 @@ const SignUpPage = () => {
           </select>
         </div>
 
-        {success && <div className="mb-4 text-green-500">{success}</div>}
-        {error && <div className="mb-4 text-red-500">{error}</div>}
-
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded"
+          className="bg-blue-600 text-white py-3 px-4 rounded-lg w-full font-semibold shadow-md hover:bg-blue-700"
         >
-          Submit
+          Sign Up
         </button>
 
-        <p className="mt-4">
+        <p className="mt-4 text-center text-gray-600">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-500 hover:underline">
+          <Link to="/login" className="text-blue-600 hover:underline">
             Login
           </Link>
         </p>
