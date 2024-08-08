@@ -15,7 +15,7 @@ router.post("/register", async (req, res) => {
     weight,
     age,
     nutritionalType,
-    illnesses,
+    goals,
     symptoms,
   } = req.body;
 
@@ -33,7 +33,7 @@ router.post("/register", async (req, res) => {
       weight,
       age,
       nutritionalType,
-      illnesses,
+      goals,
       symptoms,
     });
 
@@ -93,6 +93,31 @@ router.get("/profile", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Failed to retrieve user");
+  }
+});
+
+// Update user profile
+router.put("/profile", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { height, weight, age, nutritionalType, goals, symptoms } = req.body;
+    const updatedProfile = await User.findByIdAndUpdate(
+      userId,
+      {
+        height,
+        weight,
+        age,
+        nutritionalType,
+        goals: Array.isArray(goals) ? goals : goals.split(", "),
+        symptoms: Array.isArray(symptoms) ? symptoms : symptoms.split(", "),
+      },
+      { new: true } // Return the updated document
+    );
+
+    res.status(200).json(updatedProfile);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error updating profile");
   }
 });
 

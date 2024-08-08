@@ -1,5 +1,5 @@
 import React from "react";
-import heroimage from "../assets/supliful-supplements-on-demand-JljYkIwvfNs-unsplash.jpg"; // Adjust path accordingly
+import heroimage from "../assets/supliful-supplements-on-demand-JljYkIwvfNs-unsplash.jpg";
 
 const HomePage = () => {
   return (

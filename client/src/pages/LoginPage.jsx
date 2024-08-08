@@ -19,8 +19,6 @@ const LoginPage = () => {
         email,
         password,
       });
-
-      // Store the token received from the server
       const { authToken } = response.data;
       localStorage.setItem("authToken", authToken);
       storeToken(authToken);

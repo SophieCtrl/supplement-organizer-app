@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 5005;
@@ -31,9 +32,15 @@ app.use(
     credentials: true,
   })
 );
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
+
+// Public Route - accessible to everyone
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
 
 // Use routes
 app.use("/api/users", userRoutes);

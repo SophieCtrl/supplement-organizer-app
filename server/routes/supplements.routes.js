@@ -33,12 +33,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get supplement by name (Public access)
-router.get("/:name", async (req, res) => {
-  const { name } = req.params;
+// Get supplement by ID (Public access)
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
 
   try {
-    const supplement = await Supplement.findOne({ name });
+    const supplement = await Supplement.findById(id);
     if (!supplement) {
       return res.status(404).json({ message: "Supplement not found" });
     }

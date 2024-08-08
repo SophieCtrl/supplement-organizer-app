@@ -7,13 +7,17 @@ import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import IsAnon from "./components/IsAnon";
 import IsPrivate from "./components/IsPrivate";
+import SupplementDetailsPage from "./pages/SupplementDetailsPage";
+import SupplementListPage from "./pages/SupplementListPage";
 
 function App() {
   return (
-    <Router>
+    <>
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/supplements" element={<SupplementListPage />} />
+        <Route path="/supplements/:id" element={<SupplementDetailsPage />} />
         <Route
           path="/signup"
           element={
@@ -39,7 +43,7 @@ function App() {
           }
         />
       </Routes>
-    </Router>
+    </>
   );
 }
 
