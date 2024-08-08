@@ -5,11 +5,15 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 require("dotenv").config();
-
 const PORT = process.env.PORT || 5005;
+
+// Route Imports
 const userRoutes = require("./routes/users.routes");
 const supplementRoutes = require("./routes/supplements.routes");
 const authRoutes = require("./routes/auth.routes");
+const nutritionalTypeRoutes = require("./routes/nutritionalTypes.routes");
+const goalRoutes = require("./routes/goals.routes");
+const symptomRoutes = require("./routes/symptoms.routes");
 
 // Connect to MongoDB
 mongoose
@@ -26,7 +30,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173", // The URL of your frontend application
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -43,9 +47,12 @@ app.get("/", (req, res) => {
 });
 
 // Use routes
+app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/supplements", supplementRoutes);
-app.use("/auth", authRoutes);
+app.use("/api/nutritional-types", nutritionalTypeRoutes);
+app.use("/api/goals", goalRoutes);
+app.use("/api/symptoms", symptomRoutes);
 
 // Basic route
 app.get("/", (req, res) => {
