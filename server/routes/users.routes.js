@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
-// Register new user
+// Register new user (Public)
 router.post("/register", async (req, res) => {
   const {
     username,
@@ -54,7 +54,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login user
+// Login user (Public)
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -81,7 +81,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Get user profile
+// Get user profile (Authenticated)
 router.get("/profile", isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -96,7 +96,7 @@ router.get("/profile", isAuthenticated, async (req, res) => {
   }
 });
 
-// Update user profile
+// Update user profile (Authenticated)
 router.put("/profile", isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -111,7 +111,7 @@ router.put("/profile", isAuthenticated, async (req, res) => {
         goals: Array.isArray(goals) ? goals : goals.split(", "),
         symptoms: Array.isArray(symptoms) ? symptoms : symptoms.split(", "),
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     res.status(200).json(updatedProfile);

@@ -5,7 +5,7 @@ const Goal = require("../models/Goal.model");
 // Get all goals (Public access)
 router.get("/", async (req, res) => {
   try {
-    const goals = await Goal.find().populate("supplements", "name");
+    const goals = await Goal.find().populate("supplements");
     res.json(goals);
   } catch (error) {
     console.error(error.message);
@@ -18,7 +18,7 @@ router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const goal = await Goal.findById(id).populate("supplements", "name");
+    const goal = await Goal.findById(id).populate("supplements");
     if (!goal) {
       return res.status(404).json({ message: "Goal not found" });
     }

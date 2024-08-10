@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import axios from "../axiosInstance";
 import { AuthContext } from "../context/auth.context";
+import { Navigate, useLocation } from "react-router-dom";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -18,7 +19,8 @@ const ProfilePage = () => {
   const [goalOptions, setGoalOptions] = useState([]);
   const [symptomOptions, setSymptomOptions] = useState([]);
   const [nutritionalTypeOptions, setNutritionalTypeOptions] = useState([]);
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, isLoading } = useContext(AuthContext);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +58,14 @@ const ProfilePage = () => {
       fetchData();
     }
   }, [isLoggedIn]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!isLoggedIn && !isLoading) {
+    return <Navigate to="/login" state={{ from: location }} />;
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;

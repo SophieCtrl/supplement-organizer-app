@@ -31,9 +31,6 @@ const Navbar = () => {
                   alt="User"
                   className="w-8 h-8 rounded-full mr-2"
                 />
-                <span className="text-blue-600 font-semibold">
-                  {user.username}
-                </span>
               </div>
               {showDropdown && (
                 <ul className="absolute left-0 mt-4 pb-4 w-48 bg-white border border-gray-300 border-t-0 border-l-0 shadow-lg rounded-b">
@@ -79,26 +76,15 @@ const Navbar = () => {
               </li>
             </>
           )}
-          {isLoggedIn && (
-            <>
-              <li>
-                <Link
-                  to="/supplements"
-                  className="text-gray-700 hover:text-blue-600 font-medium"
-                >
-                  Explore
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={logOutUser}
-                  className="text-gray-700 hover:text-blue-600 font-medium"
-                >
-                  Logout
-                </button>
-              </li>
-            </>
-          )}
+
+          <li>
+            <Link
+              to="/supplements"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              All Supplements
+            </Link>
+          </li>
         </ul>
       </div>
     </nav>

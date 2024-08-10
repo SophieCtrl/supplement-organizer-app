@@ -67,10 +67,18 @@ router.post("/", isAuthenticated, async (req, res) => {
 // Get all supplements (Public access)
 router.get("/", async (req, res) => {
   try {
-    const supplements = await Supplement.find()
+    const { symptoms, goals, nutritional_types } = req.query;
+    const filters = {};
+    if (symptoms) filters.symptoms = { $in: symptoms.split(",") };
+    if (goals) filters.goals = { $in: goals.split(",") };
+    if (nutritional_types)
+      filters.nutritional_type = { $in: nutritional_types.split(",") };
+
+    const supplements = await Supplement.find(filters)
       .populate("nutritional_type")
       .populate("symptoms")
       .populate("goals");
+
     res.json(supplements);
   } catch (error) {
     console.error(error.message);
@@ -161,6 +169,25 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
     res.json({ message: "Supplement deleted" });
   } catch (error) {
     console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// Get all filter options (Public access)
+router.get("/filters", async (req, res) => {
+  try {
+    const symptoms = await Symptom.find().populate("supplements");
+    const goals = await Goal.find().populate("supplements");
+    const nutritionalTypes = await NutritionalType.find().populate(
+      "supplements"
+    );
+    res.json({
+      allSymptoms: symptoms,
+      allGoals: goals,
+      allNutritionalTypes: nutritionalTypes,
+    });
+  } catch (error) {
+    console.error("Error fetching filter options:", error.message);
     res.status(500).send("Server error");
   }
 });

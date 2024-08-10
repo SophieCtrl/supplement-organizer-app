@@ -1,19 +1,24 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/auth.context";
 
 const IsPrivate = ({ children }) => {
-  const token = localStorage.getItem("token");
-  const { isLoggedIn, isLoading } = useContext(AuthContext);
+  const { isLoggedIn, authenticateUser, isLoading } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  if (isLoading) return <p>Loading ...</p>;
+  useEffect(() => {
+    authenticateUser();
+    if (!isLoggedIn && !isLoading) {
+      navigate("/login", { state: { from: location } });
+    }
+  }, [isLoggedIn, isLoading, navigate, authenticateUser]);
 
-  if (!isLoggedIn) {
-    return <Navigate to="/login" />;
-  } else {
-    return children;
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
+
+  return isLoggedIn ? children : null;
 };
 
 export default IsPrivate;

@@ -22,11 +22,8 @@ const LoginPage = () => {
       const { authToken } = response.data;
       localStorage.setItem("authToken", authToken);
       storeToken(authToken);
-
-      // Authenticate the user with the new token
       authenticateUser();
-
-      navigate("/"); // Redirect to home page or dashboard
+      navigate("/profile");
     } catch (error) {
       setError(error.response?.data?.message || "Server error");
     }

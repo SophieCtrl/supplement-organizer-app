@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import axiosInstance from "../axiosInstance";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const AuthContext = React.createContext();
+const AuthContext = createContext();
 
 function AuthProviderWrapper(props) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,6 +16,7 @@ function AuthProviderWrapper(props) {
   const storeToken = (token) => {
     localStorage.setItem("authToken", token);
     axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
+    setIsLoggedIn(true);
   };
 
   const authenticateUser = () => {
@@ -28,20 +29,21 @@ function AuthProviderWrapper(props) {
         .then((response) => {
           const user = response.data;
           setIsLoggedIn(true);
-          setIsLoading(false);
           setUser(user);
-          navigate("/profile");
         })
         .catch((error) => {
           setAuthError(error.response?.data?.message || "Authentication error");
           setIsLoggedIn(false);
-          setIsLoading(false);
           setUser(null);
+          removeToken();
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     } else {
       setIsLoggedIn(false);
-      setIsLoading(false);
       setUser(null);
+      setIsLoading(false);
     }
   };
 
@@ -54,7 +56,7 @@ function AuthProviderWrapper(props) {
     removeToken();
     setIsLoggedIn(false);
     setUser(null);
-    navigate("/");
+    navigate("/", { state: { from: location } });
   };
 
   useEffect(() => {
