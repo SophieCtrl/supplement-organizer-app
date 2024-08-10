@@ -1,10 +1,22 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const SupplementSchema = new mongoose.Schema({
+const supplementSchema = new Schema({
   name: { type: String, required: true },
-  recommendedDosage: { type: String, required: true },
-  timing: { type: String, required: true },
-  interactions: { type: [String] },
+  type: { type: String, required: true },
+  description: { type: String, required: true },
+  contained_vitamins: [String],
+  contained_minerals: [String],
+  effect: { type: String, required: true },
+  side_effects: { type: String },
+  enhance_effect: [String],
+  reduce_effect: [String],
+  maximum_dosis: { type: String, required: true },
+  dosis_per_kg: { type: String, required: true },
+  nutritional_type: [{ type: Schema.Types.ObjectId, ref: "NutritionalType" }],
+  goals: [{ type: Schema.Types.ObjectId, ref: "Goal" }],
+  symptoms: [{ type: Schema.Types.ObjectId, ref: "Symptom" }],
 });
 
-module.exports = mongoose.model("Supplement", SupplementSchema);
+const Supplement = mongoose.model("Supplement", supplementSchema);
+module.exports = Supplement;

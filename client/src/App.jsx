@@ -4,17 +4,53 @@ import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
+import IsAnon from "./components/IsAnon";
+import IsPrivate from "./components/IsPrivate";
+import SupplementDetailsPage from "./pages/SupplementDetailsPage";
+import SupplementListPage from "./pages/SupplementListPage";
 
 function App() {
   return (
-    <Router>
+    <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/"
+          element={
+            <IsAnon>
+              <HomePage />
+            </IsAnon>
+          }
+        />
+        <Route path="/supplements" element={<SupplementListPage />} />
+        <Route path="/supplements/:id" element={<SupplementDetailsPage />} />
+        <Route
+          path="/signup"
+          element={
+            <IsAnon>
+              <SignUpPage />
+            </IsAnon>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <IsAnon>
+              <LoginPage />
+            </IsAnon>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <IsPrivate>
+              <ProfilePage />
+            </IsPrivate>
+          }
+        />
       </Routes>
-    </Router>
+    </>
   );
 }
 

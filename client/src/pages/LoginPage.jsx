@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../context/auth.context";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { storeToken, authenticateUser } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,15 +19,18 @@ const LoginPage = () => {
         email,
         password,
       });
-      localStorage.setItem("token", response.data.token);
-      navigate("/"); // Redirect to home page or dashboard
+      const { authToken } = response.data;
+      localStorage.setItem("authToken", authToken);
+      storeToken(authToken);
+      authenticateUser();
+      navigate("/profile");
     } catch (error) {
       setError(error.response?.data?.message || "Server error");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 px-4 sm:px-6 lg:px-8 my-8">
       <form
         className="bg-white p-6 rounded shadow-md w-full max-w-md"
         onSubmit={handleSubmit}
@@ -66,7 +71,7 @@ const LoginPage = () => {
 
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded"
+          className="bg-blue-600 text-white py-3 px-4 my-1 rounded-lg w-full font-semibold shadow-md hover:bg-blue-700"
         >
           Login
         </button>

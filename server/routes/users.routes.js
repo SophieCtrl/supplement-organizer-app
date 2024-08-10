@@ -3,8 +3,9 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
-// Register new user
+// Register new user (Public)
 router.post("/register", async (req, res) => {
   const {
     username,
@@ -14,7 +15,7 @@ router.post("/register", async (req, res) => {
     weight,
     age,
     nutritionalType,
-    illnesses,
+    goals,
     symptoms,
   } = req.body;
 
@@ -32,7 +33,7 @@ router.post("/register", async (req, res) => {
       weight,
       age,
       nutritionalType,
-      illnesses,
+      goals,
       symptoms,
     });
 
@@ -42,18 +43,18 @@ router.post("/register", async (req, res) => {
     await user.save();
 
     const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
       expiresIn: "1h",
     });
 
-    res.status(201).json({ token });
+    res.status(201).json({ authToken: token });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
   }
 });
 
-// Login user
+// Login user (Public)
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -69,14 +70,54 @@ router.post("/login", async (req, res) => {
     }
 
     const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
       expiresIn: "1h",
     });
 
-    res.json({ token });
+    res.json({ authToken: token });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
+  }
+});
+
+// Get user profile (Authenticated)
+router.get("/profile", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Failed to retrieve user");
+  }
+});
+
+// Update user profile (Authenticated)
+router.put("/profile", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { height, weight, age, nutritionalType, goals, symptoms } = req.body;
+    const updatedProfile = await User.findByIdAndUpdate(
+      userId,
+      {
+        height,
+        weight,
+        age,
+        nutritionalType,
+        goals: Array.isArray(goals) ? goals : goals.split(", "),
+        symptoms: Array.isArray(symptoms) ? symptoms : symptoms.split(", "),
+      },
+      { new: true }
+    );
+
+    res.status(200).json(updatedProfile);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error updating profile");
   }
 });
 
