@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import axiosInstance from "../axiosInstance";
+import { useParams, useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -8,6 +9,7 @@ const SupplementDetailsPage = () => {
   const { id } = useParams();
   const [supplement, setSupplement] = useState(null);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSupplement = async () => {
@@ -23,6 +25,23 @@ const SupplementDetailsPage = () => {
 
     fetchSupplement();
   }, [id]);
+
+  const handleAddSupplement = async () => {
+    try {
+      const response = await axiosInstance.put(
+        `${API_URL}/api/users/supplements`,
+        {
+          supplementId: id,
+        }
+      );
+      if (response.status === 200) {
+        navigate("/my-supplements");
+      }
+    } catch (error) {
+      console.error("Error adding supplement to user:", error);
+      setError("Failed to add supplement to your list.");
+    }
+  };
 
   if (error) {
     return (
@@ -64,7 +83,7 @@ const SupplementDetailsPage = () => {
           <strong>Possible Side Effects:</strong> {supplement.side_effects}
         </p>
 
-        {supplement.symptoms && (
+        {supplement.symptoms && supplement.symptoms.length > 0 && (
           <>
             <p className="text-gray-700 mb-2">
               <strong>Prevents:</strong>
@@ -82,7 +101,7 @@ const SupplementDetailsPage = () => {
           </>
         )}
 
-        {supplement.goals && (
+        {supplement.goals && supplement.goals.length > 0 && (
           <>
             <p className="text-gray-700 mb-2">
               <strong>Supports:</strong>
@@ -100,23 +119,31 @@ const SupplementDetailsPage = () => {
           </>
         )}
 
-        {supplement.nutritional_type && (
-          <>
-            <p className="text-gray-700 mb-2">
-              <strong>Supports:</strong>
-            </p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {supplement.nutritional_type.map((type, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
-                >
-                  {type.name}
-                </span>
-              ))}
-            </div>
-          </>
-        )}
+        {supplement.nutritional_type &&
+          supplement.nutritional_type.length > 0 && (
+            <>
+              <p className="text-gray-700 mb-2">
+                <strong>Nutritional Type:</strong>
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {supplement.nutritional_type.map((type, index) => (
+                  <span
+                    key={index}
+                    className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
+                  >
+                    {type.name}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+
+        <button
+          onClick={handleAddSupplement}
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Add to My Supplements
+        </button>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },
@@ -10,6 +11,14 @@ const UserSchema = new mongoose.Schema({
   nutritionalType: { type: String, required: true },
   goals: { type: [String], default: [] },
   symptoms: { type: [String], default: [] },
+  personal_supplements: [
+    {
+      supplement: { type: Schema.Types.ObjectId, ref: "Supplement" },
+      dosage: { type: Number, default: "Insert amount in mg" },
+      frequency: { type: String, default: "Select frequency" },
+      time: { type: String, default: "Select time" },
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", UserSchema);

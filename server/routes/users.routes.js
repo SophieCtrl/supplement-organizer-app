@@ -85,7 +85,9 @@ router.post("/login", async (req, res) => {
 router.get("/profile", isAuthenticated, async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId)
+      .select("-password")
+      .populate("personal_supplements.supplement");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -118,6 +120,47 @@ router.put("/profile", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).send("Error updating profile");
+  }
+});
+
+router.put("/supplements", isAuthenticated, async (req, res) => {
+  const userId = req.user.id;
+  const { supplementId, dosage, frequency, time } = req.body;
+
+  try {
+    if (!userId || !supplementId || typeof dosage !== "number") {
+      return res
+        .status(400)
+        .json({ message: "Missing required fields or incorrect dosage type" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const supplementIndex = user.personal_supplements.findIndex(
+      (s) => s.supplement.toString() === supplementId
+    );
+
+    if (supplementIndex === -1) {
+      return res
+        .status(404)
+        .json({ message: "Supplement not found in user's list" });
+    }
+
+    user.personal_supplements[supplementIndex] = {
+      ...user.personal_supplements[supplementIndex],
+      dosage,
+      frequency,
+      time,
+    };
+
+    await user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error updating supplement:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
