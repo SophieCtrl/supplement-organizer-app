@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+const { addUserSupplement } = require("../controllers/userController");
 
 // Register new user (Public)
 router.post("/register", async (req, res) => {
@@ -98,69 +99,74 @@ router.get("/profile", isAuthenticated, async (req, res) => {
   }
 });
 
-// Update user profile (Authenticated)
-router.put("/profile", isAuthenticated, async (req, res) => {
+// Get user supplements (Authenticated)
+router.get("/api/users/supplements", isAuthenticated, async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { height, weight, age, nutritionalType, goals, symptoms } = req.body;
-    const updatedProfile = await User.findByIdAndUpdate(
-      userId,
-      {
-        height,
-        weight,
-        age,
-        nutritionalType,
-        goals: Array.isArray(goals) ? goals : goals.split(", "),
-        symptoms: Array.isArray(symptoms) ? symptoms : symptoms.split(", "),
-      },
-      { new: true }
+    const user = await User.findById(req.user._id).populate(
+      "personal_supplements"
     );
-
-    res.status(200).json(updatedProfile);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    res.status(200).json(user.personal_supplements);
   } catch (error) {
-    console.error(error);
-    res.status(400).send("Error updating profile");
+    console.error("Error fetching supplements:", error);
+    res.status(500).json({ message: "Failed to fetch supplements." });
   }
 });
 
-router.put("/supplements", isAuthenticated, async (req, res) => {
-  const userId = req.user.id;
-  const { supplementId, dosage, frequency, time } = req.body;
-
+// Update user profile (Authenticated)
+router.put("/profile", async (req, res) => {
   try {
-    if (!userId || !supplementId || typeof dosage !== "number") {
-      return res
-        .status(400)
-        .json({ message: "Missing required fields or incorrect dosage type" });
-    }
+    let { goals, symptoms, ...otherData } = req.body;
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    // Validate and sanitize goals and symptoms
+    if (typeof goals === "string")
+      goals = goals.split(",").map((goal) => goal.trim());
+    if (typeof symptoms === "string")
+      symptoms = symptoms.split(",").map((symptom) => symptom.trim());
 
-    const supplementIndex = user.personal_supplements.findIndex(
-      (s) => s.supplement.toString() === supplementId
+    // Update user profile
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { goals, symptoms, ...otherData },
+      { new: true }
     );
 
-    if (supplementIndex === -1) {
-      return res
-        .status(404)
-        .json({ message: "Supplement not found in user's list" });
-    }
+    if (!updatedUser) return res.status(404).json({ error: "User not found" });
 
-    user.personal_supplements[supplementIndex] = {
-      ...user.personal_supplements[supplementIndex],
-      dosage,
-      frequency,
-      time,
-    };
-
-    await user.save();
-    res.status(200).json(user);
+    res.json(updatedUser);
   } catch (error) {
-    console.error("Error updating supplement:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Error in /profile:", error.message);
+    res.status(500).json({ error: "Profile update failed. Please try again." });
+  }
+});
+
+// Route to add a supplement to a user's list
+router.post("/supplements", isAuthenticated, addUserSupplement);
+
+// Route to update supplement details for a user
+router.put("/supplements/:supplementId", async (req, res) => {
+  try {
+    const { supplementId } = req.params;
+    const { dosage, frequency, time } = req.body;
+
+    const user = await User.findById(req.user._id);
+    const supplement = user.personal_supplements.find(
+      (supp) => supp.id.toString() === supplementId
+    );
+
+    if (supplement) {
+      supplement.dosage = dosage;
+      supplement.frequency = frequency;
+      supplement.time = time;
+      await user.save();
+      res.status(200).json({ message: "Supplement updated successfully." });
+    } else {
+      res.status(404).json({ message: "Supplement not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update supplement." });
   }
 });
 

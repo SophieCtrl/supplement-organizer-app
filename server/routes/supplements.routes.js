@@ -65,24 +65,33 @@ router.post("/", isAuthenticated, async (req, res) => {
 });
 
 // Get all supplements (Public access)
+// Filtered Supplements Route
 router.get("/", async (req, res) => {
   try {
     const { symptoms, goals, nutritional_types } = req.query;
-    const filters = {};
-    if (symptoms) filters.symptoms = { $in: symptoms.split(",") };
-    if (goals) filters.goals = { $in: goals.split(",") };
-    if (nutritional_types)
-      filters.nutritional_type = { $in: nutritional_types.split(",") };
 
-    const supplements = await Supplement.find(filters)
-      .populate("nutritional_type")
-      .populate("symptoms")
-      .populate("goals");
+    const filter = {};
+    if (symptoms)
+      filter.symptoms = {
+        $in: symptoms.split(",").map((symptom) => symptom.trim()),
+      };
+    if (goals)
+      filter.goals = { $in: goals.split(",").map((goal) => goal.trim()) };
+    if (nutritional_types)
+      filter.nutritional_types = {
+        $in: nutritional_types.split(",").map((nt) => nt.trim()),
+      };
+
+    const supplements = await Supplement.find(filter).populate(
+      "contained_vitamins contained_minerals enhance_effect reduce_effect"
+    );
 
     res.json(supplements);
   } catch (error) {
-    console.error(error.message);
-    res.status(500).send("Server error");
+    console.error("Error in GET /:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve supplements. Please try again." });
   }
 });
 
@@ -176,19 +185,16 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
 // Get all filter options (Public access)
 router.get("/filters", async (req, res) => {
   try {
-    const symptoms = await Symptom.find().populate("supplements");
-    const goals = await Goal.find().populate("supplements");
-    const nutritionalTypes = await NutritionalType.find().populate(
-      "supplements"
-    );
-    res.json({
-      allSymptoms: symptoms,
-      allGoals: goals,
-      allNutritionalTypes: nutritionalTypes,
-    });
+    const symptoms = await Symptom.find().lean();
+    const goals = await Goal.find().lean();
+    const nutritionalTypes = await NutritionalType.find().lean();
+
+    res.json({ symptoms, goals, nutritionalTypes });
   } catch (error) {
-    console.error("Error fetching filter options:", error.message);
-    res.status(500).send("Server error");
+    console.error("Error in /filters:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve filters. Please try again." });
   }
 });
 

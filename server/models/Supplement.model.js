@@ -16,6 +16,7 @@ const supplementSchema = new Schema({
   nutritional_type: [{ type: Schema.Types.ObjectId, ref: "NutritionalType" }],
   goals: [{ type: Schema.Types.ObjectId, ref: "Goal" }],
   symptoms: [{ type: Schema.Types.ObjectId, ref: "Symptom" }],
+  users: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 const Supplement = mongoose.model("Supplement", supplementSchema);

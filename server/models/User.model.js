@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
   personal_supplements: [
     {
       supplement: { type: Schema.Types.ObjectId, ref: "Supplement" },
-      dosage: { type: Number, default: "Insert amount in mg" },
+      dosage: { type: Number },
       frequency: { type: String, default: "Select frequency" },
       time: { type: String, default: "Select time" },
     },

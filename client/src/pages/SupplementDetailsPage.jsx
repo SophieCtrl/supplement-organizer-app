@@ -28,18 +28,23 @@ const SupplementDetailsPage = () => {
 
   const handleAddSupplement = async () => {
     try {
-      const response = await axiosInstance.put(
-        `${API_URL}/api/users/supplements`,
-        {
-          supplementId: id,
-        }
-      );
+      console.log("Supplement ID:", supplement._id);
+      const response = await axiosInstance.post(`/api/users/supplements`, {
+        _id: supplement._id,
+      });
+      console.log("Response:", response.data);
+      // Handle successful response
       if (response.status === 200) {
         navigate("/my-supplements");
       }
     } catch (error) {
-      console.error("Error adding supplement to user:", error);
-      setError("Failed to add supplement to your list.");
+      if (error.response) {
+        console.error("Error Response:", error.response.data);
+      } else if (error.request) {
+        console.error("Error Request:", error.request);
+      } else {
+        console.error("Error Message:", error.message);
+      }
     }
   };
 
@@ -48,7 +53,7 @@ const SupplementDetailsPage = () => {
       <div className="min-h-screen bg-gray-50 p-6 pt-20">
         <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
           <h1 className="text-3xl font-bold text-gray-900">Error</h1>
-          <p className="text-red-600 font-semibold">{error}</p>
+          <p className="text-red-600 font-semibold">{error.message}</p>
         </div>
       </div>
     );
