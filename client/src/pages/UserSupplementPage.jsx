@@ -15,7 +15,8 @@ const UserSupplementPage = () => {
   useEffect(() => {
     const fetchPersonalSupplements = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/users/supplements`);
+        const response = await axios.get(`/api/users/profile`);
+        console.log(response.data);
         setPersonalSupplements(response.data);
         console.log(response);
       } catch (error) {
@@ -51,7 +52,7 @@ const UserSupplementPage = () => {
   const handleSave = async (supplementId) => {
     try {
       const response = await axios.put(
-        `${API_URL}/api/users/supplements/${supplementId}`,
+        `/api/users/supplements/${supplementId}`,
         {
           dosage: Number(editedSupplements[supplementId]?.dosage) || 0,
           frequency: editedSupplements[supplementId]?.frequency || "",
@@ -59,7 +60,7 @@ const UserSupplementPage = () => {
         }
       );
       // Optionally refetch the data or update local state
-      const fetchResponse = await axios.get(`${API_URL}/api/users/profile`);
+      const fetchResponse = await axios.get(`/api/users/profile`);
       setPersonalSupplements(fetchResponse.data.personal_supplements);
       setEditedSupplements({ ...editedSupplements, [supplementId]: {} });
       setChangedSupplements((prev) => {

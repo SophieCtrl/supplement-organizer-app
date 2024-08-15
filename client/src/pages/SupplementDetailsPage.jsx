@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import axiosInstance from "../axiosInstance";
 import { useParams, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/auth.context";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,6 +11,24 @@ const SupplementDetailsPage = () => {
   const [supplement, setSupplement] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const { isLoggedIn, isLoading } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosInstance.get("/api/users/profile");
+        setUser(response.data);
+        console.log(response.data);
+      } catch (err) {
+        setError("Failed to fetch user profile or options.");
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchUser();
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const fetchSupplement = async () => {
@@ -28,9 +47,10 @@ const SupplementDetailsPage = () => {
 
   const handleAddSupplement = async () => {
     try {
-      console.log("Supplement ID:", supplement._id);
+      console.log("Supplement ID:", supplement._id, " User ID:", user._id);
       const response = await axiosInstance.post(`/api/users/supplements`, {
-        _id: supplement._id,
+        userId: user._id,
+        supplementId: supplement._id,
       });
       console.log("Response:", response.data);
       // Handle successful response

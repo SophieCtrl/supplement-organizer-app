@@ -99,51 +99,50 @@ router.get("/profile", isAuthenticated, async (req, res) => {
   }
 });
 
-// Get user supplements (Authenticated)
-router.get("/api/users/supplements", isAuthenticated, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).populate(
-      "personal_supplements"
-    );
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-    res.status(200).json(user.personal_supplements);
-  } catch (error) {
-    console.error("Error fetching supplements:", error);
-    res.status(500).json({ message: "Failed to fetch supplements." });
-  }
-});
-
 // Update user profile (Authenticated)
-router.put("/profile", async (req, res) => {
+router.put("/profile", isAuthenticated, async (req, res) => {
   try {
-    let { goals, symptoms, ...otherData } = req.body;
-
-    // Validate and sanitize goals and symptoms
-    if (typeof goals === "string")
-      goals = goals.split(",").map((goal) => goal.trim());
-    if (typeof symptoms === "string")
-      symptoms = symptoms.split(",").map((symptom) => symptom.trim());
-
-    // Update user profile
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user.id,
-      { goals, symptoms, ...otherData },
+    const userId = req.user.id;
+    const { height, weight, age, nutritionalType, goals, symptoms } = req.body;
+    const updatedProfile = await User.findByIdAndUpdate(
+      userId,
+      {
+        height,
+        weight,
+        age,
+        nutritionalType,
+        goals: Array.isArray(goals) ? goals : goals.split(", "),
+        symptoms: Array.isArray(symptoms) ? symptoms : symptoms.split(", "),
+      },
       { new: true }
     );
 
-    if (!updatedUser) return res.status(404).json({ error: "User not found" });
-
-    res.json(updatedUser);
+    res.status(200).json(updatedProfile);
   } catch (error) {
-    console.error("Error in /profile:", error.message);
-    res.status(500).json({ error: "Profile update failed. Please try again." });
+    console.error(error);
+    res.status(400).send("Error updating profile");
   }
 });
 
 // Route to add a supplement to a user's list
-router.post("/supplements", isAuthenticated, addUserSupplement);
+router.post("/supplements", async (req, res) => {
+  const { userId, supplementId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Add the supplementId to the user's personal_supplements array
+    user.personal_supplements.push(supplementId);
+    await user.save();
+
+    res.status(200).json({ message: "Supplement added successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
 
 // Route to update supplement details for a user
 router.put("/supplements/:supplementId", async (req, res) => {
@@ -151,7 +150,7 @@ router.put("/supplements/:supplementId", async (req, res) => {
     const { supplementId } = req.params;
     const { dosage, frequency, time } = req.body;
 
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
     const supplement = user.personal_supplements.find(
       (supp) => supp.id.toString() === supplementId
     );

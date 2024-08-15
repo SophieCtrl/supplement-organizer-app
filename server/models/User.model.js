@@ -15,8 +15,8 @@ const UserSchema = new mongoose.Schema({
     {
       supplement: { type: Schema.Types.ObjectId, ref: "Supplement" },
       dosage: { type: Number },
-      frequency: { type: String, default: "Select frequency" },
-      time: { type: String, default: "Select time" },
+      frequency: { type: String },
+      time: { type: String },
     },
   ],
 });
