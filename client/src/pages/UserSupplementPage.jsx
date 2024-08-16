@@ -1,4 +1,5 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState, useRef } from "react";
 import axios from "../axiosInstance";
 import { Link } from "react-router-dom";
@@ -59,6 +60,18 @@ const UserSupplementPage = () => {
     }
   };
 
+  const handleDelete = async (supplementId) => {
+    try {
+      await axios.delete(`/api/users/supplements/${supplementId}`);
+      // Remove the deleted supplement from the state
+      setPersonalSupplements((prev) =>
+        prev.filter((item) => item._id !== supplementId)
+      );
+    } catch (error) {
+      console.error("Error deleting supplement:", error);
+    }
+  };
+
   const toggleDropdown = (supplementId, field) => {
     setOpenDropdown(
       openDropdown === `${supplementId}-${field}`
@@ -86,7 +99,7 @@ const UserSupplementPage = () => {
           {personalSupplements.length > 0 ? (
             personalSupplements.map((item) => (
               <div key={item._id} className="bg-white p-4 shadow rounded-lg">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                   {item.supplement ? (
                     <>
                       <Link
@@ -184,6 +197,14 @@ const UserSupplementPage = () => {
                             )}
                           </div>
                         )}
+                      </div>
+                      <div className="flex justify-end lg:justify-center items-center">
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300"
+                        >
+                          <TrashIcon className="w-5 h-5" />
+                        </button>
                       </div>
                       {changedSupplements.has(item._id) && (
                         <button

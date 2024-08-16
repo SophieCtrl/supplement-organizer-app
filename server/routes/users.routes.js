@@ -190,4 +190,36 @@ router.put("/supplements/:supplementId", isAuthenticated, async (req, res) => {
   }
 });
 
+// Route to delete a supplement from a user's list
+router.delete(
+  "/supplements/:supplementId",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const { supplementId } = req.params;
+
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const supplementIndex = user.personal_supplements.findIndex(
+        (supp) => supp._id.toString() === supplementId
+      );
+
+      if (supplementIndex === -1) {
+        return res.status(404).json({ message: "Supplement not found" });
+      }
+
+      user.personal_supplements.splice(supplementIndex, 1);
+      await user.save();
+
+      res.status(200).json({ message: "Supplement deleted successfully" });
+    } catch (error) {
+      console.error("Failed to delete supplement:", error);
+      res.status(500).json({ message: "Failed to delete supplement" });
+    }
+  }
+);
+
 module.exports = router;
