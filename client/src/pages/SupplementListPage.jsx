@@ -13,6 +13,7 @@ const SupplementListPage = () => {
     goals: [],
     nutritional_types: [],
   });
+  const [typeFilter, setTypeFilter] = useState(""); // New state for type filter
   const [allFilters, setAllFilters] = useState({
     allSymptoms: [],
     allGoals: [],
@@ -20,44 +21,138 @@ const SupplementListPage = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch supplements and filter options
   useEffect(() => {
     const fetchSupplements = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/supplements`, {
-          params: { ...filters },
+        const response = await axios.get(`${API_URL}/api/supplements`);
+        const data = response.data;
+
+        const filteredSupplements = data.filter((supplement) => {
+          const symptoms = supplement.symptoms || [];
+          const goals = supplement.goals || [];
+          const nutritionalType = supplement.nutritional_type || [];
+          const type = supplement.type || "";
+
+          const matchesSymptom =
+            filters.symptoms.length === 0 ||
+            filters.symptoms.every((symptom) => symptoms.includes(symptom));
+
+          const matchesGoal =
+            filters.goals.length === 0 ||
+            filters.goals.every((goal) => goals.includes(goal));
+
+          const matchesNutritionalType =
+            filters.nutritional_types.length === 0 ||
+            filters.nutritional_types.every((type) =>
+              nutritionalType.includes(type)
+            );
+
+          const matchesType =
+            typeFilter === "" ||
+            type.toLowerCase().includes(typeFilter.toLowerCase());
+
+          return (
+            matchesSymptom &&
+            matchesGoal &&
+            matchesNutritionalType &&
+            matchesType
+          );
         });
-        setSupplements(response.data);
+
+        const sortedSupplements = filteredSupplements.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+
+        setSupplements(sortedSupplements);
       } catch (error) {
         setError("Error fetching supplements");
         console.error(error);
       }
     };
 
+    fetchSupplements();
+  }, [filters, typeFilter]);
+
+  // Fetch filter options from JSON file
+  useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/filters`);
-        setAllFilters(response.data);
+        const response = await fetch("/filters.json");
+        const data = await response.json();
+        console.log("Fetched filters:", data); // Debug: Log fetched filters
+        setAllFilters({
+          allSymptoms: data.symptoms,
+          allGoals: data.goals,
+          allNutritionalTypes: data.nutritional_types,
+        });
       } catch (error) {
         console.error("Error fetching filter options", error);
       }
     };
 
-    fetchSupplements();
     fetchFilters();
-  }, [filters]);
+  }, []);
 
   // Handle filter change
-  const handleFilterChange = (type, value) => {
+  const handleFilterChange = (type, values) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
-      [type]: value,
+      [type]: values,
     }));
+  };
+
+  // Handle type filter change
+  const handleTypeFilterChange = (type) => {
+    setTypeFilter(type);
+  };
+
+  // Reset filters
+  const resetFilters = () => {
+    setFilters({
+      symptoms: [],
+      goals: [],
+      nutritional_types: [],
+    });
+    setTypeFilter(""); // Reset type filter
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 pt-20">
       {error && <div className="mb-6 text-red-600 font-semibold">{error}</div>}
+
+      {/* Type Filter Buttons */}
+      <div className="mb-4 flex overflow-x-auto space-x-2">
+        <button
+          onClick={() => handleTypeFilterChange("vitamin")}
+          className={`py-2 px-4 rounded-lg ${
+            typeFilter === "vitamin"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          Vitamins
+        </button>
+        <button
+          onClick={() => handleTypeFilterChange("mineral")}
+          className={`py-2 px-4 rounded-lg ${
+            typeFilter === "mineral"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          Minerals
+        </button>
+        <button
+          onClick={() => handleTypeFilterChange("supplement")}
+          className={`py-2 px-4 rounded-lg ${
+            typeFilter === "supplement"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          Supplements
+        </button>
+      </div>
 
       <div className="flex flex-col md:flex-row">
         {/* Filters Toggle Button for Mobile */}
@@ -89,6 +184,7 @@ const SupplementListPage = () => {
             <select
               multiple
               className="w-full bg-white border border-gray-300 rounded-lg"
+              value={filters.symptoms}
               onChange={(e) =>
                 handleFilterChange(
                   "symptoms",
@@ -97,7 +193,7 @@ const SupplementListPage = () => {
               }
             >
               {allFilters.allSymptoms.map((symptom) => (
-                <option key={symptom._id} value={symptom._id}>
+                <option key={symptom._id} value={symptom.name}>
                   {symptom.name}
                 </option>
               ))}
@@ -110,6 +206,7 @@ const SupplementListPage = () => {
             <select
               multiple
               className="w-full bg-white border border-gray-300 rounded-lg"
+              value={filters.goals}
               onChange={(e) =>
                 handleFilterChange(
                   "goals",
@@ -118,7 +215,7 @@ const SupplementListPage = () => {
               }
             >
               {allFilters.allGoals.map((goal) => (
-                <option key={goal._id} value={goal._id}>
+                <option key={goal._id} value={goal.name}>
                   {goal.name}
                 </option>
               ))}
@@ -131,6 +228,7 @@ const SupplementListPage = () => {
             <select
               multiple
               className="w-full bg-white border border-gray-300 rounded-lg"
+              value={filters.nutritional_types}
               onChange={(e) =>
                 handleFilterChange(
                   "nutritional_types",
@@ -139,11 +237,21 @@ const SupplementListPage = () => {
               }
             >
               {allFilters.allNutritionalTypes.map((type) => (
-                <option key={type._id} value={type._id}>
+                <option key={type._id} value={type.name}>
                   {type.name}
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Reset Filters Button */}
+          <div className="mt-4">
+            <button
+              onClick={resetFilters}
+              className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg"
+            >
+              Reset Filters
+            </button>
           </div>
         </div>
 

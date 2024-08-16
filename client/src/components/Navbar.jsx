@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
-import userImage from "../assets/female-avatar.png";
+import userImage from "../assets/icon1.png";
 
 const Navbar = () => {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
@@ -44,10 +44,10 @@ const Navbar = () => {
                   </li>
                   <li className="py-2 px-4 hover:bg-gray-100">
                     <Link
-                      to="/supplements"
+                      to="/my-supplements"
                       className="text-gray-700 hover:text-blue-600 text-sm font-medium"
                     >
-                      Supplements
+                      My Supplements
                     </Link>
                   </li>
                   <li className="py-2 px-4 hover:bg-gray-100">

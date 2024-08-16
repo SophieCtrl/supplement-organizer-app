@@ -9,6 +9,7 @@ import IsAnon from "./components/IsAnon";
 import IsPrivate from "./components/IsPrivate";
 import SupplementDetailsPage from "./pages/SupplementDetailsPage";
 import SupplementListPage from "./pages/SupplementListPage";
+import UserSupplementPage from "./pages/UserSupplementPage";
 
 function App() {
   return (
@@ -46,6 +47,14 @@ function App() {
           element={
             <IsPrivate>
               <ProfilePage />
+            </IsPrivate>
+          }
+        />
+        <Route
+          path="/my-supplements"
+          element={
+            <IsPrivate>
+              <UserSupplementPage />
             </IsPrivate>
           }
         />

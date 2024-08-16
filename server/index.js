@@ -11,9 +11,6 @@ const PORT = process.env.PORT || 5005;
 const userRoutes = require("./routes/users.routes");
 const supplementRoutes = require("./routes/supplements.routes");
 const authRoutes = require("./routes/auth.routes");
-const nutritionalTypeRoutes = require("./routes/nutritionalTypes.routes");
-const goalRoutes = require("./routes/goals.routes");
-const symptomRoutes = require("./routes/symptoms.routes");
 
 // Connect to MongoDB
 mongoose
@@ -50,9 +47,6 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/supplements", supplementRoutes);
-app.use("/api/nutritional-types", nutritionalTypeRoutes);
-app.use("/api/goals", goalRoutes);
-app.use("/api/symptoms", symptomRoutes);
 
 // Basic route
 app.get("/", (req, res) => {

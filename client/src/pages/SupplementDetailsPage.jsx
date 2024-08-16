@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import axiosInstance from "../axiosInstance";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { AuthContext } from "../context/auth.context";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -8,6 +10,32 @@ const SupplementDetailsPage = () => {
   const { id } = useParams();
   const [supplement, setSupplement] = useState(null);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const { isLoggedIn, isLoading } = useContext(AuthContext);
+  const [isAlreadyAdded, setIsAlreadyAdded] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosInstance.get("/api/users/profile");
+        setUser(response.data);
+        console.log(response.data);
+
+        // Check if the supplement is already in personal_supplements
+        const supplementExists = response.data.personal_supplements.some(
+          (supp) => supp.supplement._id === id
+        );
+        setIsAlreadyAdded(supplementExists);
+      } catch (err) {
+        setError("Failed to fetch user profile or options.");
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchUser();
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const fetchSupplement = async () => {
@@ -24,16 +52,32 @@ const SupplementDetailsPage = () => {
     fetchSupplement();
   }, [id]);
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6 pt-20">
-        <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-900">Error</h1>
-          <p className="text-red-600 font-semibold">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  const handleAddSupplement = async () => {
+    try {
+      console.log("Supplement ID:", supplement._id, " User ID:", user._id);
+
+      const response = await axiosInstance.post(`/api/users/supplements`, {
+        userId: user._id,
+        supplementId: supplement._id,
+        dosage: 0,
+        frequency: "",
+        time: "",
+      });
+      console.log("Response:", response.data);
+      // Handle successful response
+      if (response.status === 200) {
+        navigate("/my-supplements");
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error("Error Response:", error.response.data);
+      } else if (error.request) {
+        console.error("Error Request:", error.request);
+      } else {
+        console.error("Error Message:", error.message);
+      }
+    }
+  };
 
   if (!supplement) {
     return (
@@ -64,7 +108,7 @@ const SupplementDetailsPage = () => {
           <strong>Possible Side Effects:</strong> {supplement.side_effects}
         </p>
 
-        {supplement.symptoms && (
+        {supplement.symptoms && supplement.symptoms.length > 0 && (
           <>
             <p className="text-gray-700 mb-2">
               <strong>Prevents:</strong>
@@ -75,14 +119,14 @@ const SupplementDetailsPage = () => {
                   key={index}
                   className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
                 >
-                  {type.name}
+                  {type}
                 </span>
               ))}
             </div>
           </>
         )}
 
-        {supplement.goals && (
+        {supplement.goals && supplement.goals.length > 0 && (
           <>
             <p className="text-gray-700 mb-2">
               <strong>Supports:</strong>
@@ -93,29 +137,52 @@ const SupplementDetailsPage = () => {
                   key={index}
                   className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
                 >
-                  {type.name}
+                  {type}
                 </span>
               ))}
             </div>
           </>
         )}
 
-        {supplement.nutritional_type && (
-          <>
-            <p className="text-gray-700 mb-2">
-              <strong>Supports:</strong>
+        {supplement.nutritional_type &&
+          supplement.nutritional_type.length > 0 && (
+            <>
+              <p className="text-gray-700 mb-2">
+                <strong>Nutritional Type:</strong>
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {supplement.nutritional_type.map((type, index) => (
+                  <span
+                    key={index}
+                    className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
+                  >
+                    {type}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+
+        {isLoggedIn ? (
+          !isAlreadyAdded ? (
+            <button
+              onClick={handleAddSupplement}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Add to My Supplements
+            </button>
+          ) : (
+            <p className="mt-4 text-gray-600">
+              This supplement is already in your list.
             </p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {supplement.nutritional_type.map((type, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
-                >
-                  {type.name}
-                </span>
-              ))}
-            </div>
-          </>
+          )
+        ) : (
+          <p className="mt-4 pt-4 text-gray-600">
+            <Link to="/login" className="text-blue-500 underline">
+              Login
+            </Link>{" "}
+            to add this supplement to your personal list.
+          </p>
         )}
       </div>
     </div>
