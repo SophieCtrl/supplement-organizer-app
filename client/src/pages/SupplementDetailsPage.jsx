@@ -48,9 +48,12 @@ const SupplementDetailsPage = () => {
   const handleAddSupplement = async () => {
     try {
       console.log("Supplement ID:", supplement._id, " User ID:", user._id);
+
       const response = await axiosInstance.post(`/api/users/supplements`, {
         userId: user._id,
         supplementId: supplement._id,
+        frequency: "",
+        time: "",
       });
       console.log("Response:", response.data);
       // Handle successful response

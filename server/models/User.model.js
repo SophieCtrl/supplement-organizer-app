@@ -17,6 +17,10 @@ const UserSchema = new mongoose.Schema({
       dosage: { type: Number },
       frequency: { type: String },
       time: { type: String },
+      _id: {
+        type: Schema.Types.ObjectId,
+        default: new mongoose.Types.ObjectId(),
+      },
     },
   ],
 });

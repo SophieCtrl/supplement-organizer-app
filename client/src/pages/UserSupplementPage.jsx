@@ -16,9 +16,7 @@ const UserSupplementPage = () => {
     const fetchPersonalSupplements = async () => {
       try {
         const response = await axios.get(`/api/users/profile`);
-        console.log(response.data);
-        setPersonalSupplements(response.data);
-        console.log(response);
+        setPersonalSupplements(response.data.personal_supplements);
       } catch (error) {
         console.error("Error fetching personal supplements", error);
       }
@@ -27,25 +25,14 @@ const UserSupplementPage = () => {
     fetchPersonalSupplements();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenDropdown(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const handleInputChange = (supplementId, field, value) => {
-    setEditedSupplements({
-      ...editedSupplements,
+    setEditedSupplements((prev) => ({
+      ...prev,
       [supplementId]: {
-        ...editedSupplements[supplementId],
+        ...prev[supplementId],
         [field]: value,
       },
-    });
+    }));
     setChangedSupplements((prev) => new Set(prev.add(supplementId)));
   };
 
@@ -53,30 +40,22 @@ const UserSupplementPage = () => {
     try {
       const response = await axios.put(
         `/api/users/supplements/${supplementId}`,
-        {
-          dosage: Number(editedSupplements[supplementId]?.dosage) || 0,
-          frequency: editedSupplements[supplementId]?.frequency || "",
-          time: editedSupplements[supplementId]?.time || "",
-        }
+        editedSupplements[supplementId] // Pass only the edited fields
       );
-      // Optionally refetch the data or update local state
+      // Refetch the updated supplements
       const fetchResponse = await axios.get(`/api/users/profile`);
       setPersonalSupplements(fetchResponse.data.personal_supplements);
-      setEditedSupplements({ ...editedSupplements, [supplementId]: {} });
+      setEditedSupplements((prev) => ({
+        ...prev,
+        [supplementId]: {},
+      }));
       setChangedSupplements((prev) => {
         const updated = new Set(prev);
         updated.delete(supplementId);
         return updated;
       });
-      console.log("Response:", response);
     } catch (error) {
-      if (error.response) {
-        console.error("Error Response:", error.response.data);
-      } else if (error.request) {
-        console.error("Error Request:", error.request);
-      } else {
-        console.error("Error Message:", error.message);
-      }
+      console.error("Error updating supplement:", error);
     }
   };
 
@@ -94,14 +73,7 @@ const UserSupplementPage = () => {
   };
 
   const handleDosageChange = (e, supplementId) => {
-    const newDosage = Number(e.target.value);
-    setEditedSupplements((prev) => ({
-      ...prev,
-      [supplementId]: {
-        ...prev[supplementId],
-        dosage: newDosage,
-      },
-    }));
+    handleInputChange(supplementId, "dosage", Number(e.target.value));
   };
 
   return (
@@ -112,8 +84,8 @@ const UserSupplementPage = () => {
         </h2>
         <div className="space-y-4">
           {personalSupplements.length > 0 ? (
-            personalSupplements.map((item, index) => (
-              <div key={index} className="bg-white p-4 shadow rounded-lg">
+            personalSupplements.map((item) => (
+              <div key={item._id} className="bg-white p-4 shadow rounded-lg">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {item.supplement ? (
                     <>
@@ -130,12 +102,9 @@ const UserSupplementPage = () => {
                         <input
                           type="number"
                           value={
-                            editedSupplements[item.supplement._id]?.dosage ||
-                            item.dosage
+                            editedSupplements[item._id]?.dosage || item.dosage
                           }
-                          onChange={(e) =>
-                            handleDosageChange(e, item.supplement._id)
-                          }
+                          onChange={(e) => handleDosageChange(e, item._id)}
                           className="block w-full p-2 border border-gray-300 rounded-md"
                           min="0"
                         />
@@ -146,21 +115,17 @@ const UserSupplementPage = () => {
                         </label>
                         <button
                           type="button"
-                          onClick={() =>
-                            toggleDropdown(item.supplement._id, "frequency")
-                          }
+                          onClick={() => toggleDropdown(item._id, "frequency")}
                           className="block w-full p-2 border border-gray-300 rounded-md text-left flex items-center justify-between text-lg"
                         >
                           <span className="truncate">
-                            {editedSupplements[item.supplement._id]
-                              ?.frequency ||
+                            {editedSupplements[item._id]?.frequency ||
                               item.frequency ||
                               "Select Frequency"}
                           </span>
                           <ChevronDownIcon className="w-5 h-5 text-gray-600 ml-2" />
                         </button>
-                        {openDropdown ===
-                          `${item.supplement._id}-frequency` && (
+                        {openDropdown === `${item._id}-frequency` && (
                           <div
                             ref={dropdownRef}
                             className="absolute bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-auto z-10"
@@ -171,11 +136,7 @@ const UserSupplementPage = () => {
                                   key={idx}
                                   type="button"
                                   onClick={() =>
-                                    selectOption(
-                                      item.supplement._id,
-                                      "frequency",
-                                      option
-                                    )
+                                    selectOption(item._id, "frequency", option)
                                   }
                                   className="block w-full p-2 text-left text-sm hover:bg-gray-100"
                                 >
@@ -192,19 +153,17 @@ const UserSupplementPage = () => {
                         </label>
                         <button
                           type="button"
-                          onClick={() =>
-                            toggleDropdown(item.supplement._id, "time")
-                          }
+                          onClick={() => toggleDropdown(item._id, "time")}
                           className="block w-full p-2 border border-gray-300 rounded-md text-left flex items-center justify-between text-lg"
                         >
                           <span className="truncate">
-                            {editedSupplements[item.supplement._id]?.time ||
+                            {editedSupplements[item._id]?.time ||
                               item.time ||
                               "Select Time"}
                           </span>
                           <ChevronDownIcon className="w-5 h-5 text-gray-600 ml-2" />
                         </button>
-                        {openDropdown === `${item.supplement._id}-time` && (
+                        {openDropdown === `${item._id}-time` && (
                           <div
                             ref={dropdownRef}
                             className="absolute bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-auto z-10"
@@ -215,11 +174,7 @@ const UserSupplementPage = () => {
                                   key={idx}
                                   type="button"
                                   onClick={() =>
-                                    selectOption(
-                                      item.supplement._id,
-                                      "time",
-                                      option
-                                    )
+                                    selectOption(item._id, "time", option)
                                   }
                                   className="block w-full p-2 text-left text-sm hover:bg-gray-100"
                                 >
@@ -230,9 +185,9 @@ const UserSupplementPage = () => {
                           </div>
                         )}
                       </div>
-                      {changedSupplements.has(item.supplement._id) && (
+                      {changedSupplements.has(item._id) && (
                         <button
-                          onClick={() => handleSave(item.supplement._id)} // Make sure to pass the correct supplementId
+                          onClick={() => handleSave(item._id)} // Ensure the correct ID is used
                           className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         >
                           Save

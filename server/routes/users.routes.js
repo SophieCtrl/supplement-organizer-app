@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 const { addUserSupplement } = require("../controllers/userController");
+const mongoose = require("mongoose");
 
 // Register new user (Public)
 router.post("/register", async (req, res) => {
@@ -126,7 +127,14 @@ router.put("/profile", isAuthenticated, async (req, res) => {
 
 // Route to add a supplement to a user's list
 router.post("/supplements", async (req, res) => {
-  const { userId, supplementId } = req.body;
+  const { userId, supplementId, dosage, frequency, time } = req.body;
+
+  if (
+    !mongoose.Types.ObjectId.isValid(userId) ||
+    !mongoose.Types.ObjectId.isValid(supplementId)
+  ) {
+    return res.status(400).json({ message: "Invalid userId or supplementId" });
+  }
 
   try {
     const user = await User.findById(userId);
@@ -134,37 +142,51 @@ router.post("/supplements", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Create a new supplement entry with a unique ObjectId
+    const newSupplement = {
+      supplement: supplementId,
+      dosage: dosage,
+      frequency: frequency,
+      time: time,
+      _id: new mongoose.Types.ObjectId(), // Generate a unique ObjectId for the supplement entry
+    };
+
     // Add the supplementId to the user's personal_supplements array
-    user.personal_supplements.push(supplementId);
+    user.personal_supplements.push(newSupplement);
     await user.save();
 
     res.status(200).json({ message: "Supplement added successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Server Error:", error.stack); // Log the error stack trace
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
 // Route to update supplement details for a user
-router.put("/supplements/:supplementId", async (req, res) => {
+router.put("/supplements/:supplementId", isAuthenticated, async (req, res) => {
   try {
     const { supplementId } = req.params;
     const { dosage, frequency, time } = req.body;
 
     const user = await User.findById(req.user.id);
+    console.log("User's supplements:", user.personal_supplements);
+    console.log("Supplement ID to update:", supplementId);
+
     const supplement = user.personal_supplements.find(
-      (supp) => supp.id.toString() === supplementId
+      (supp) => supp._id.toString() === supplementId
     );
 
-    if (supplement) {
-      supplement.dosage = dosage;
-      supplement.frequency = frequency;
-      supplement.time = time;
-      await user.save();
-      res.status(200).json({ message: "Supplement updated successfully." });
-    } else {
-      res.status(404).json({ message: "Supplement not found." });
+    if (!supplement) {
+      return res.status(404).json({ message: "Supplement not found." });
     }
+
+    supplement.dosage = dosage;
+    supplement.frequency = frequency;
+    supplement.time = time;
+    await user.save();
+    res.status(200).json({ message: "Supplement updated successfully." });
   } catch (error) {
+    console.error("Failed to update supplement:", error);
     res.status(500).json({ message: "Failed to update supplement." });
   }
 });
