@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Supplement = require("../models/Supplement.model");
-const Symptom = require("../models/Symptom.model");
-const Goal = require("../models/Goal.model");
-const NutritionalType = require("../models/NutritionalType.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // Add a new supplement (Authenticated user access)
