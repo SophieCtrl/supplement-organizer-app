@@ -13,9 +13,9 @@ const supplementSchema = new Schema({
   reduce_effect: [String],
   maximum_dosis: { type: String, required: true },
   dosis_per_kg: { type: String, required: true },
-  nutritional_type: [{ type: Schema.Types.ObjectId, ref: "NutritionalType" }],
-  goals: [{ type: Schema.Types.ObjectId, ref: "Goal" }],
-  symptoms: [{ type: Schema.Types.ObjectId, ref: "Symptom" }],
+  nutritional_type: [String],
+  goals: [String],
+  symptoms: [String],
   users: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 

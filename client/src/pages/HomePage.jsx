@@ -3,11 +3,11 @@ import heroimage from "../assets/supliful-supplements-on-demand-JljYkIwvfNs-unsp
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center pt-16 px-4 sm:px-6 lg:px-8 mx-6">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center pt-6 px-4 sm:px-6 lg:px-8 mx-6">
       <div className="max-w-6xl w-full flex flex-col lg:flex-row items-center space-y-8 lg:space-y-0 lg:space-x-8">
-        <div className="text-center lg:text-left lg:flex-1 mt-4">
-          <h1 className="text-4xl font-extrabold text-gray-900 mt-8 my-4">
-            Welcome to NutriTrack, your Ultimate Supplement Tracker
+        <div className="text-center lg:text-left lg:flex-1">
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-8">
+            Welcome to NutriTrack
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed">
             Achieve optimal health and wellness with NutriTrack, the all-in-one

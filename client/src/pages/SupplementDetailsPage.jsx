@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import axiosInstance from "../axiosInstance";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -13,6 +13,7 @@ const SupplementDetailsPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const { isLoggedIn, isLoading } = useContext(AuthContext);
+  const [isAlreadyAdded, setIsAlreadyAdded] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -20,6 +21,12 @@ const SupplementDetailsPage = () => {
         const response = await axiosInstance.get("/api/users/profile");
         setUser(response.data);
         console.log(response.data);
+
+        // Check if the supplement is already in personal_supplements
+        const supplementExists = response.data.personal_supplements.some(
+          (supp) => supp.supplement._id === id
+        );
+        setIsAlreadyAdded(supplementExists);
       } catch (err) {
         setError("Failed to fetch user profile or options.");
       }
@@ -52,6 +59,7 @@ const SupplementDetailsPage = () => {
       const response = await axiosInstance.post(`/api/users/supplements`, {
         userId: user._id,
         supplementId: supplement._id,
+        dosage: 0,
         frequency: "",
         time: "",
       });
@@ -70,17 +78,6 @@ const SupplementDetailsPage = () => {
       }
     }
   };
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6 pt-20">
-        <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-900">Error</h1>
-          <p className="text-red-600 font-semibold">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!supplement) {
     return (
@@ -122,7 +119,7 @@ const SupplementDetailsPage = () => {
                   key={index}
                   className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
                 >
-                  {type.name}
+                  {type}
                 </span>
               ))}
             </div>
@@ -140,7 +137,7 @@ const SupplementDetailsPage = () => {
                   key={index}
                   className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
                 >
-                  {type.name}
+                  {type}
                 </span>
               ))}
             </div>
@@ -159,19 +156,34 @@ const SupplementDetailsPage = () => {
                     key={index}
                     className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
                   >
-                    {type.name}
+                    {type}
                   </span>
                 ))}
               </div>
             </>
           )}
 
-        <button
-          onClick={handleAddSupplement}
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Add to My Supplements
-        </button>
+        {isLoggedIn ? (
+          !isAlreadyAdded ? (
+            <button
+              onClick={handleAddSupplement}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Add to My Supplements
+            </button>
+          ) : (
+            <p className="mt-4 text-gray-600">
+              This supplement is already in your list.
+            </p>
+          )
+        ) : (
+          <p className="mt-4 pt-4 text-gray-600">
+            <Link to="/login" className="text-blue-500 underline">
+              Login
+            </Link>{" "}
+            to add this supplement to your personal list.
+          </p>
+        )}
       </div>
     </div>
   );
