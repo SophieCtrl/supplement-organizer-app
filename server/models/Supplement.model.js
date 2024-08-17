@@ -16,6 +16,7 @@ const supplementSchema = new Schema({
   nutritional_type: [String],
   goals: [String],
   symptoms: [String],
+  brands: [{ type: Schema.Types.ObjectId, ref: "Brand" }],
   users: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 

@@ -3,10 +3,11 @@ import axios from "axios";
 import axiosInstance from "../axiosInstance";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
+import BrandList from "../components/BrandList";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const SupplementDetailsPage = () => {
+const SupplementDetailsPage = ({ supplementId }) => {
   const { id } = useParams();
   const [supplement, setSupplement] = useState(null);
   const [error, setError] = useState("");
@@ -20,7 +21,6 @@ const SupplementDetailsPage = () => {
       try {
         const response = await axiosInstance.get("/api/users/profile");
         setUser(response.data);
-        console.log(response.data);
 
         // Check if the supplement is already in personal_supplements
         const supplementExists = response.data.personal_supplements.some(
@@ -41,7 +41,6 @@ const SupplementDetailsPage = () => {
     const fetchSupplement = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/supplements/${id}`);
-        console.log(response.data);
         setSupplement(response.data);
       } catch (error) {
         setError("Error fetching supplement details");
@@ -54,8 +53,6 @@ const SupplementDetailsPage = () => {
 
   const handleAddSupplement = async () => {
     try {
-      console.log("Supplement ID:", supplement._id, " User ID:", user._id);
-
       const response = await axiosInstance.post(`/api/users/supplements`, {
         userId: user._id,
         supplementId: supplement._id,
@@ -63,7 +60,6 @@ const SupplementDetailsPage = () => {
         frequency: "",
         time: "",
       });
-      console.log("Response:", response.data);
       // Handle successful response
       if (response.status === 200) {
         navigate("/my-supplements");
@@ -184,6 +180,8 @@ const SupplementDetailsPage = () => {
             to add this supplement to your personal list.
           </p>
         )}
+
+        {isLoggedIn && <BrandList supplementId={supplementId} />}
       </div>
     </div>
   );

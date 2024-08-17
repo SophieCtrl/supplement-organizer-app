@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Supplement = require("../models/Supplement.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+const Brand = require("../models/Brand.model");
 
 // Add a new supplement (Authenticated user access)
 router.post("/", isAuthenticated, async (req, res) => {
@@ -192,6 +193,38 @@ router.get("/filters", async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to retrieve filters. Please try again." });
+  }
+});
+
+// Get all brands for a specific supplement
+router.get("/:supplementId/brands", async (req, res) => {
+  try {
+    const brands = await Brand.find({
+      parent_supplement: req.params.supplementId,
+    });
+    res.json(brands);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Create a brand
+router.post("/:supplementId/brands", async (req, res) => {
+  const brand = new Brand({
+    brand: req.body.name,
+    form: req.body.form,
+    size: req.body.size,
+    dosage_mg: req.body.dosage_mg,
+    additional_ingrediens: req.body.additional_ingrediens,
+    vegan: req.body.vegan,
+    parent_supplement: req.params.supplementId,
+  });
+
+  try {
+    const newBrand = await brand.save();
+    res.status(201).json(newBrand);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
