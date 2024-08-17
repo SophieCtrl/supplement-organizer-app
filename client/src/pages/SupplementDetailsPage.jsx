@@ -181,7 +181,7 @@ const SupplementDetailsPage = ({ supplementId }) => {
           </p>
         )}
 
-        {isLoggedIn && <BrandList supplementId={supplementId} />}
+        {isLoggedIn && <BrandList supplementId={id} />}
       </div>
     </div>
   );

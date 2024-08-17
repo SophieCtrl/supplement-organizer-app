@@ -79,7 +79,6 @@ const SupplementListPage = () => {
       try {
         const response = await fetch("/filters.json");
         const data = await response.json();
-        console.log("Fetched filters:", data); // Debug: Log fetched filters
         setAllFilters({
           allSymptoms: data.symptoms,
           allGoals: data.goals,

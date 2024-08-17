@@ -86,7 +86,12 @@ const UserSupplementPage = () => {
   };
 
   const handleDosageChange = (e, supplementId) => {
-    handleInputChange(supplementId, "dosage", Number(e.target.value));
+    const value = e.target.value;
+    if (value === "") {
+      handleInputChange(supplementId, "dosage", "");
+    } else {
+      handleInputChange(supplementId, "dosage", Number(value));
+    }
   };
 
   return (
@@ -115,7 +120,9 @@ const UserSupplementPage = () => {
                         <input
                           type="number"
                           value={
-                            editedSupplements[item._id]?.dosage || item.dosage
+                            editedSupplements[item._id]?.dosage !== undefined
+                              ? editedSupplements[item._id].dosage
+                              : item.dosage
                           }
                           onChange={(e) => handleDosageChange(e, item._id)}
                           className="block w-full p-2 border border-gray-300 rounded-md"

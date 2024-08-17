@@ -197,7 +197,7 @@ router.get("/filters", async (req, res) => {
 });
 
 // Get all brands for a specific supplement
-router.get("/:supplementId/brands", async (req, res) => {
+router.get("/:supplementId/brands", isAuthenticated, async (req, res) => {
   try {
     const brands = await Brand.find({
       parent_supplement: req.params.supplementId,
@@ -209,7 +209,7 @@ router.get("/:supplementId/brands", async (req, res) => {
 });
 
 // Create a brand
-router.post("/:supplementId/brands", async (req, res) => {
+router.post("/:supplementId/brands", isAuthenticated, async (req, res) => {
   const brand = new Brand({
     brand: req.body.name,
     form: req.body.form,

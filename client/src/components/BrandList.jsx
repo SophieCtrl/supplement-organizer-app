@@ -40,13 +40,39 @@ const BrandList = ({ supplementId }) => {
       <h2 className="text-2xl font-bold text-gray-900 mb-4">
         Existing Brands:
       </h2>
-      <ul className="list-disc pl-5 mb-4">
+      <ul className="list-none pl-0 mb-4">
         {brands.map((brand) => (
           <li
-            key={brand.id}
+            key={brand._id}
             className="bg-white shadow-lg rounded-lg p-4 border border-gray-200 mb-2 text-gray-700"
           >
-            {brand.name}
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-lg">{brand.brand}</span>
+              {brand.vegan && (
+                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                  Vegan
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <div>
+                <p>
+                  <strong>Form:</strong> {brand.form}
+                </p>
+                <p>
+                  <strong>Size:</strong> {brand.size}
+                </p>
+              </div>
+              <div>
+                <p>
+                  <strong>Portion per daily dose:</strong> {brand.dosage_mg} mg
+                </p>
+                <p>
+                  <strong>Additional Ingredients:</strong>{" "}
+                  {brand.additional_ingrediens.join(", ")}
+                </p>
+              </div>
+            </div>
           </li>
         ))}
       </ul>

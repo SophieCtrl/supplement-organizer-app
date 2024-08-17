@@ -56,7 +56,7 @@ const BrandForm = ({ onAddBrand }) => {
           id="form"
           value={form}
           onChange={(e) => setForm(e.target.value)}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
         >
           <option value="pills">Pills</option>
           <option value="capsules">Capsules</option>
@@ -81,7 +81,7 @@ const BrandForm = ({ onAddBrand }) => {
           htmlFor="dosageMg"
           className="block text-gray-700 font-bold mb-2"
         >
-          Dosage (mg):
+          Portion per daily dose (mg):
         </label>
         <input
           type="number"
