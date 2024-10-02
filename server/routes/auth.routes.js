@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 
 const router = express.Router();
-const { isAuthenticated } = require("../middleware/jwt.middleware"); // Importing middleware
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 const saltRounds = 10;
 

@@ -1,8 +1,9 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import axios from "../axiosInstance";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/auth.context";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -11,6 +12,7 @@ const UserSupplementPage = () => {
   const [editedSupplements, setEditedSupplements] = useState({});
   const [openDropdown, setOpenDropdown] = useState(null);
   const [changedSupplements, setChangedSupplements] = useState(new Set());
+  const { isLoggedIn, isLoading } = useContext(AuthContext);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -23,7 +25,9 @@ const UserSupplementPage = () => {
       }
     };
 
-    fetchPersonalSupplements();
+    if (isLoggedIn) {
+      fetchPersonalSupplements();
+    }
   }, []);
 
   const handleInputChange = (supplementId, field, value) => {
