@@ -130,10 +130,7 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${API_URL}/api/users/register`,
-        formData
-      );
+      const response = await axios.post(`${API_URL}/auth/register`, formData);
       setSuccess("Registration successful! Redirecting to login page...");
       setTimeout(() => navigate("/login"), 1000);
     } catch (error) {

@@ -13,7 +13,7 @@ const SupplementListPage = () => {
     goals: [],
     nutritional_types: [],
   });
-  const [typeFilter, setTypeFilter] = useState(""); // New state for type filter
+  const [typeFilter, setTypeFilter] = useState("");
   const [allFilters, setAllFilters] = useState({
     allSymptoms: [],
     allGoals: [],

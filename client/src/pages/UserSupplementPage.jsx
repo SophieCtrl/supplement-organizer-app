@@ -45,7 +45,7 @@ const UserSupplementPage = () => {
     try {
       const response = await axios.put(
         `/api/users/supplements/${supplementId}`,
-        editedSupplements[supplementId] // Pass only the edited fields
+        editedSupplements[supplementId]
       );
       // Refetch the updated supplements
       const fetchResponse = await axios.get(`/api/users/profile`);
