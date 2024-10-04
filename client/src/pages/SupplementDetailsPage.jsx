@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import axiosInstance from "../axiosInstance";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 import BrandList from "../components/BrandList";
 
@@ -12,6 +12,7 @@ const SupplementDetailsPage = ({ supplementId }) => {
   const [supplement, setSupplement] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const { isLoggedIn, isLoading } = useContext(AuthContext);
   const [isAlreadyAdded, setIsAlreadyAdded] = useState(false);
@@ -172,7 +173,11 @@ const SupplementDetailsPage = ({ supplementId }) => {
           )
         ) : (
           <p className="mt-4 pt-4 text-gray-600">
-            <Link to="/login" className="text-blue-500 underline">
+            <Link
+              to="/login"
+              state={{ from: location }}
+              className="text-blue-500 underline"
+            >
               Login
             </Link>{" "}
             to add this supplement to your personal list.

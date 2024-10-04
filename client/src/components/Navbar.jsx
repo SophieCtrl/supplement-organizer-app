@@ -1,11 +1,12 @@
 import { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 import userImage from "../assets/icon1.png";
 
 const Navbar = () => {
   const { isLoggedIn, logOutUser, user } = useContext(AuthContext);
   const [showDropdown, setShowDropdown] = useState(false);
+  const location = useLocation();
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -69,6 +70,7 @@ const Navbar = () => {
               <li>
                 <Link
                   to="/login"
+                  state={{ from: location }}
                   className="text-gray-700 hover:text-blue-600 font-medium"
                 >
                   Login

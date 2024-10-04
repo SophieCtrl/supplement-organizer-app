@@ -1,16 +1,16 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/auth.context";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const LoginPage = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { storeToken, authenticateUser } = useContext(AuthContext);
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,9 +21,9 @@ const LoginPage = () => {
       });
       const { authToken } = response.data;
       localStorage.setItem("authToken", authToken);
-      storeToken(authToken);
+      const redirectPath = location.state?.from?.pathname || "/profile";
+      storeToken(authToken, redirectPath);
       authenticateUser();
-      navigate("/profile");
     } catch (error) {
       setError(error.response?.data?.message || "Server error");
     }

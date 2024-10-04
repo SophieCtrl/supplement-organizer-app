@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext } from "react";
 import axiosInstance from "../axiosInstance";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -11,12 +11,15 @@ function AuthProviderWrapper(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [authError, setAuthError] = useState(null);
+  const [redirectPath, setRedirectPath] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const storeToken = (token) => {
+  const storeToken = (token, redirectPath = "/") => {
     localStorage.setItem("authToken", token);
     axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
     setIsLoggedIn(true);
+    setRedirectPath(redirectPath);
   };
 
   const authenticateUser = () => {
@@ -30,6 +33,10 @@ function AuthProviderWrapper(props) {
           const user = response.data;
           setIsLoggedIn(true);
           setUser(user);
+          if (redirectPath) {
+            navigate(redirectPath, { state: { from: location } });
+            setRedirectPath(null); // Clear the redirect path after navigation
+          }
         })
         .catch((error) => {
           setAuthError(error.response?.data?.message || "Authentication error");
