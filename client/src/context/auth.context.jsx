@@ -2,8 +2,6 @@ import { useState, useEffect, createContext } from "react";
 import axiosInstance from "../axiosInstance";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const AuthContext = createContext();
 
 function AuthProviderWrapper(props) {
@@ -35,7 +33,7 @@ function AuthProviderWrapper(props) {
           setUser(user);
           if (redirectPath) {
             navigate(redirectPath, { state: { from: location } });
-            setRedirectPath(null); // Clear the redirect path after navigation
+            setRedirectPath(null);
           }
         })
         .catch((error) => {
