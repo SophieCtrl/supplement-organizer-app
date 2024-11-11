@@ -7,7 +7,7 @@ const Brand = require("../models/Brand.model");
 // Get all supplements and apply filters (Public access)
 router.get("/", async (req, res) => {
   try {
-    const { symptoms, goals, nutritional_types } = req.query;
+    const { symptoms, goals } = req.query;
 
     const filter = {};
     if (symptoms)
@@ -16,10 +16,6 @@ router.get("/", async (req, res) => {
       };
     if (goals)
       filter.goals = { $in: goals.split(",").map((goal) => goal.trim()) };
-    if (nutritional_types)
-      filter.nutritional_types = {
-        $in: nutritional_types.split(",").map((nt) => nt.trim()),
-      };
 
     const supplements = await Supplement.find(filter).populate(
       "contained_vitamins contained_minerals enhance_effect reduce_effect"
@@ -65,7 +61,8 @@ router.put("/:id", isAuthenticated, async (req, res) => {
     reduce_effect,
     maximum_dosis,
     dosis_per_kg,
-    nutritional_type,
+    is_vegan,
+    is_vegetarian,
     goals,
     symptoms,
   } = req.body;
@@ -85,7 +82,8 @@ router.put("/:id", isAuthenticated, async (req, res) => {
         reduce_effect,
         maximum_dosis,
         dosis_per_kg,
-        nutritional_type,
+        is_vegan,
+        is_vegetarian,
         goals,
         symptoms,
       },

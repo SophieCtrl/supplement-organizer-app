@@ -64,13 +64,6 @@
     { "_id": "62", "name": "Frequent Infections" },
     { "_id": "63", "name": "Unexplained Fever" }
   ],
-  "nutritional_types": [
-    { "_id": "1", "name": "Vegetarian" },
-    { "_id": "2", "name": "Vegan" },
-    { "_id": "3", "name": "Pescatarian" },
-    { "_id": "4", "name": "Omnivore" },
-    { "_id": "5", "name": "Paleo" }
-  ],
   "goals": [
     { "_id": "1", "name": "Improve Overall Well-being" },
     { "_id": "2", "name": "Emotional Balance" },

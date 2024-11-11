@@ -90,6 +90,21 @@ const SupplementDetailsPage = ({ supplementId }) => {
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
           {supplement.name}
         </h1>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {supplement.is_vegan && (
+            <span className="bg-green-800 text-white px-3 py-1 rounded-full border border-green-800 flex items-center">
+              Vegan
+            </span>
+          )}
+
+          {supplement.is_vegetarian && (
+            <span className="bg-green-600 text-white px-3 py-1 rounded-full border border-green-600 flex items-center">
+              Vegetarian
+            </span>
+          )}
+        </div>
+
         <p className="text-gray-700 mb-2">
           <strong>Description:</strong> {supplement.description}
         </p>
@@ -138,25 +153,6 @@ const SupplementDetailsPage = ({ supplementId }) => {
             </div>
           </>
         )}
-
-        {supplement.nutritional_type &&
-          supplement.nutritional_type.length > 0 && (
-            <>
-              <p className="text-gray-700 mb-2">
-                <strong>Nutritional Type:</strong>
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {supplement.nutritional_type.map((type, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full border border-gray-400 flex items-center"
-                  >
-                    {type}
-                  </span>
-                ))}
-              </div>
-            </>
-          )}
 
         {isLoggedIn ? (
           !isAlreadyAdded ? (

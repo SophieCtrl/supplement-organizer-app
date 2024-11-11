@@ -11,13 +11,13 @@ const SupplementListPage = () => {
   const [filters, setFilters] = useState({
     symptoms: [],
     goals: [],
-    nutritional_types: [],
+    is_vegan: false,
+    is_vegetarian: false,
   });
   const [typeFilter, setTypeFilter] = useState("");
   const [allFilters, setAllFilters] = useState({
     allSymptoms: [],
     allGoals: [],
-    allNutritionalTypes: [],
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -30,7 +30,9 @@ const SupplementListPage = () => {
         const filteredSupplements = data.filter((supplement) => {
           const symptoms = supplement.symptoms || [];
           const goals = supplement.goals || [];
-          const nutritionalType = supplement.nutritional_type || [];
+          const isVeganMatch = !filters.is_vegan || supplement.is_vegan;
+          const isVegetarianMatch =
+            !filters.is_vegetarian || supplement.is_vegetarian;
           const type = supplement.type || "";
 
           const matchesSymptom =
@@ -41,12 +43,6 @@ const SupplementListPage = () => {
             filters.goals.length === 0 ||
             filters.goals.every((goal) => goals.includes(goal));
 
-          const matchesNutritionalType =
-            filters.nutritional_types.length === 0 ||
-            filters.nutritional_types.every((type) =>
-              nutritionalType.includes(type)
-            );
-
           const matchesType =
             typeFilter === "" ||
             type.toLowerCase().includes(typeFilter.toLowerCase());
@@ -54,7 +50,8 @@ const SupplementListPage = () => {
           return (
             matchesSymptom &&
             matchesGoal &&
-            matchesNutritionalType &&
+            isVeganMatch &&
+            isVegetarianMatch &&
             matchesType
           );
         });
@@ -82,7 +79,6 @@ const SupplementListPage = () => {
         setAllFilters({
           allSymptoms: data.symptoms,
           allGoals: data.goals,
-          allNutritionalTypes: data.nutritional_types,
         });
       } catch (error) {
         console.error("Error fetching filter options", error);
@@ -92,7 +88,6 @@ const SupplementListPage = () => {
     fetchFilters();
   }, []);
 
-  // Handle filter change
   const handleFilterChange = (type, values) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -100,19 +95,25 @@ const SupplementListPage = () => {
     }));
   };
 
-  // Handle type filter change
+  const handleCheckboxChange = (filterName) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: !prevFilters[filterName],
+    }));
+  };
+
   const handleTypeFilterChange = (type) => {
     setTypeFilter(type);
   };
 
-  // Reset filters
   const resetFilters = () => {
     setFilters({
       symptoms: [],
       goals: [],
-      nutritional_types: [],
+      is_vegan: false,
+      is_vegetarian: false,
     });
-    setTypeFilter(""); // Reset type filter
+    setTypeFilter("");
   };
 
   return (
@@ -221,26 +222,27 @@ const SupplementListPage = () => {
             </select>
           </div>
 
-          {/* Nutritional Types Filter */}
-          <div>
-            <label className="block mb-2 font-medium">Nutritional Types</label>
-            <select
-              multiple
-              className="w-full bg-white border border-gray-300 rounded-lg"
-              value={filters.nutritional_types}
-              onChange={(e) =>
-                handleFilterChange(
-                  "nutritional_types",
-                  Array.from(e.target.selectedOptions, (option) => option.value)
-                )
-              }
-            >
-              {allFilters.allNutritionalTypes.map((type) => (
-                <option key={type._id} value={type.name}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
+          {/* Vegan and Vegetarian Checkboxes */}
+          <div className="mb-4">
+            <label className="block font-medium mb-2">Dietary Options</label>
+            <div className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                checked={filters.is_vegan}
+                onChange={() => handleCheckboxChange("is_vegan")}
+                className="mr-2"
+              />
+              <label>Vegan</label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={filters.is_vegetarian}
+                onChange={() => handleCheckboxChange("is_vegetarian")}
+                className="mr-2"
+              />
+              <label>Vegetarian</label>
+            </div>
           </div>
 
           {/* Reset Filters Button */}
