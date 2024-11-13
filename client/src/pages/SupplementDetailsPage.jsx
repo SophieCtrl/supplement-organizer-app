@@ -87,23 +87,37 @@ const SupplementDetailsPage = ({ supplementId }) => {
   return (
     <div className="min-h-screen bg-gray-50 p-6 pt-20">
       <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          {supplement.name}
-        </h1>
+        <span className="flex items-center gap-6 mb-4">
+          <h1 className="text-3xl font-bold text-gray-900">
+            {supplement.name}
+          </h1>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+          {supplement.is_vegan && (
+            <span className="text-sm bg-green-800 text-white px-3 py-1 rounded-full border border-green-800 flex items-center">
+              Vegan
+            </span>
+          )}
+
+          {supplement.is_vegetarian && !supplement.is_vegan ? (
+            <span className="text-sm bg-green-600 text-white px-3 py-1 rounded-full border border-green-600 flex items-center">
+              Vegetarian
+            </span>
+          ) : undefined}
+        </span>
+
+        {/* <div className="flex flex-wrap gap-2 mb-4">
           {supplement.is_vegan && (
             <span className="bg-green-800 text-white px-3 py-1 rounded-full border border-green-800 flex items-center">
               Vegan
             </span>
           )}
 
-          {supplement.is_vegetarian && (
+          {supplement.is_vegetarian && !supplement.is_vegan ? (
             <span className="bg-green-600 text-white px-3 py-1 rounded-full border border-green-600 flex items-center">
               Vegetarian
             </span>
-          )}
-        </div>
+          ) : undefined}
+        </div> */}
 
         <p className="text-gray-700 mb-2">
           <strong>Description:</strong> {supplement.description}
